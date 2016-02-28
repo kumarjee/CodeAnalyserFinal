@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="impactAnalyzer" name="Impact Analyzer" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <userTask id="usertask1" name="Upload Biz Requirement/Functional Spec" activiti:assignee="kermit">
+      <extensionElements>
+        <activiti:formProperty id="reqId" name="Enter Requirement Name" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="bizReq" name="Enter Business Req/Functional Spec" type="string" variable="bizReq" required="true"></activiti:formProperty>
+        <activiti:formProperty id="isPOSReviewReq" name="Click to review the generated nouns from requirement" type="boolean" required="true"></activiti:formProperty>
+        <activiti:formProperty id="codeRepoRef" name="Application Repository URL" type="string" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="servicetask1" name="Natural Language Processor" activiti:class="com.infosys.hackathon.tools.impactanalyzer.processor.LanguageProcessor"></serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="servicetask1"></sequenceFlow>
+    <serviceTask id="servicetask3" name="Identify Application Objects/Entities" activiti:class="com.infosys.hackathon.tools.impactanalyzer.processor.ObjectIdentifier">
+      <extensionElements>
+        <activiti:executionListener event="start" class="com.infosys.hackathon.tools.impactanalyzer.listener.ObjectListListener"></activiti:executionListener>
+      </extensionElements>
+    </serviceTask>
+    <userTask id="usertask2" name="Review and Submit Object List" activiti:assignee="fozzie">
+      <extensionElements>
+        <activiti:formProperty id="reviewCheck" name="Click to submit the impact analysis data with estimates for approval" type="boolean" required="true"></activiti:formProperty>
+        <activiti:taskListener event="create" class="com.infosys.hackathon.tools.impactanalyzer.listener.NotifyApprover"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow7" sourceRef="servicetask3" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="servicetask1" targetRef="servicetask3"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow10" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
+    <userTask id="usertask3" name="Final Approval" activiti:assignee="gonzo">
+      <extensionElements>
+        <activiti:formProperty id="approve" name="Click to accept the Impact Analysis and Estimates." type="boolean" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow12" sourceRef="exclusivegateway1" targetRef="usertask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewCheck}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow13" sourceRef="usertask3" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow14" sourceRef="exclusivegateway1" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!reviewCheck}]]></conditionExpression>
+    </sequenceFlow>
+    <textAnnotation id="textannotation1">
+      <text>ReEnter the Spec</text>
+    </textAnnotation>
+    <textAnnotation id="textannotation2">
+      <text>Send for approval</text>
+    </textAnnotation>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_impactAnalyzer">
+    <bpmndi:BPMNPlane bpmnElement="impactAnalyzer" id="BPMNPlane_impactAnalyzer">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="52.0" y="238.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="71.0" width="131.0" x="142.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="71.0" width="151.0" x="342.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask3" id="BPMNShape_servicetask3">
+        <omgdc:Bounds height="71.0" width="141.0" x="600.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="71.0" width="124.0" x="356.0" y="355.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="200.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="168.0" y="477.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="380.0" y="487.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation1" id="BPMNShape_textannotation1">
+        <omgdc:Bounds height="50.0" width="100.0" x="225.0" y="306.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation2" id="BPMNShape_textannotation2">
+        <omgdc:Bounds height="50.0" width="100.0" x="230.0" y="425.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="87.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="255.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="273.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="342.0" y="255.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="670.0" y="291.0"></omgdi:waypoint>
+        <omgdi:waypoint x="670.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="493.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="255.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="356.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="220.0" y="410.0"></omgdi:waypoint>
+        <omgdi:waypoint x="216.0" y="427.0"></omgdi:waypoint>
+        <omgdi:waypoint x="220.0" y="477.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="273.0" y="504.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="504.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="220.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="291.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
